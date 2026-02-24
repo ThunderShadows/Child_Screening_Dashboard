@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CECI Screening - Cognitive Game Testing</title>
+    <meta name="description" content="Child Effort-Cognition Index screening tool with interactive cognitive games">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>CECI Cognitive Screening</h1>
+        <p class="subtitle">Interactive Game-Based Assessment for Early Identification</p>
+    </div>
+
+    <!-- ════════════════ SCREEN 1: Age Selection ════════════════ -->
+    <div id="screen-home" class="screen active">
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:rgba(59,130,246,0.15); color:var(--accent-blue);">&#127919;</div>
+                Select Age Group
+            </div>
+            <div class="age-grid">
+                <div class="age-card" onclick="selectAgeGroup('0-2')">
+                    <span class="emoji">&#128118;</span>
+                    <div class="age-label">0 - 2 Years</div>
+                    <div class="age-desc">Infant / Toddler</div>
+                    <span class="game-count">3 Games</span>
+                </div>
+                <div class="age-card" onclick="selectAgeGroup('3-5')">
+                    <span class="emoji">&#128103;</span>
+                    <div class="age-label">3 - 5 Years</div>
+                    <div class="age-desc">Preschool</div>
+                    <span class="game-count">4 Games</span>
+                </div>
+                <div class="age-card" onclick="selectAgeGroup('6-9')">
+                    <span class="emoji">&#129489;</span>
+                    <div class="age-label">6 - 9 Years</div>
+                    <div class="age-desc">Early School</div>
+                    <span class="game-count">5 Games</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Simulate Section -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:rgba(139,92,246,0.15); color:var(--accent-purple);">&#9889;</div>
+                Quick Simulate (Skip Games)
+            </div>
+            <p style="color:var(--text-secondary); margin-bottom:16px; font-size:0.9rem;">
+                Generate synthetic child data and see CECI predictions without playing games.
+            </p>
+            <div class="simulate-panel">
+                <select id="sim-age">
+                    <option value="0-2">Age 0-2</option>
+                    <option value="3-5" selected>Age 3-5</option>
+                    <option value="6-9">Age 6-9</option>
+                </select>
+                <select id="sim-profile">
+                    <option value="typical">Typical Child</option>
+                    <option value="effort_variable">Effort Variable</option>
+                    <option value="at_risk">At Risk</option>
+                </select>
+                <select id="sim-sessions">
+                    <option value="5">5 Sessions</option>
+                    <option value="7" selected>7 Sessions</option>
+                    <option value="10">10 Sessions</option>
+                </select>
+                <button class="btn btn-primary" onclick="runSimulation()">
+                    Simulate & Predict
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════ SCREEN 2: Game Play ════════════════ -->
+    <div id="screen-game" class="screen">
+        <div class="breadcrumb">
+            <a onclick="showScreen('home')">Home</a>
+            <span class="sep">/</span>
+            <span id="breadcrumb-age">Age 3-5</span>
+            <span class="sep">/</span>
+            <span id="breadcrumb-game">Game</span>
+        </div>
+
+        <div class="card">
+            <div class="game-header">
+                <h2 id="game-title">Game Name</h2>
+                <div class="session-badge">
+                    Session <span id="session-num">1</span> / <span id="total-sessions">3</span>
+                </div>
+            </div>
+
+            <div class="trial-info">
+                <span>Trial <span id="trial-num">1</span> / <span id="total-trials">15</span></span>
+                <span id="game-domain" style="color:var(--accent-cyan);"></span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="trial-progress" style="width:0%"></div>
+            </div>
+
+            <div class="game-canvas" id="game-canvas">
+                <!-- Dynamic game content injected here -->
+            </div>
+
+            <div class="score-display" id="score-display" style="display:none;">
+                <div class="score-item">
+                    <div class="value" id="live-accuracy">0%</div>
+                    <div class="label">Accuracy</div>
+                </div>
+                <div class="score-item">
+                    <div class="value" id="live-rt">0s</div>
+                    <div class="label">Avg RT</div>
+                </div>
+                <div class="score-item">
+                    <div class="value" id="live-streak">0</div>
+                    <div class="label">Streak</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════ SCREEN 3: Session Summary ════════════════ -->
+    <div id="screen-session-end" class="screen">
+        <div class="card">
+            <div class="session-summary">
+                <h3 id="session-end-title">Session Complete!</h3>
+                <div class="score-display" style="justify-content:center;">
+                    <div class="score-item">
+                        <div class="value" id="end-accuracy">0%</div>
+                        <div class="label">Accuracy</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="value" id="end-rt">0s</div>
+                        <div class="label">Avg Reaction Time</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="value" id="end-engagement">0%</div>
+                        <div class="label">Engagement</div>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btn-next-session" onclick="startNextSession()">
+                        Next Session &#8594;
+                    </button>
+                    <button class="btn btn-success" id="btn-view-results" onclick="finishAndPredict()" style="display:none;">
+                        View CECI Results
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════ SCREEN 4: CECI Results ════════════════ -->
+    <div id="screen-results" class="screen">
+        <div class="breadcrumb">
+            <a onclick="resetAll()">Home</a>
+            <span class="sep">/</span>
+            <span>CECI Results</span>
+        </div>
+
+        <div class="results-grid">
+            <!-- CECI Score -->
+            <div class="card" style="text-align:center;">
+                <div class="card-title" style="justify-content:center;">
+                    <div class="icon" style="background:rgba(59,130,246,0.15); color:var(--accent-blue);">&#127919;</div>
+                    CECI Score
+                </div>
+                <div class="ceci-gauge" id="ceci-gauge">
+                    <div class="gauge-ring"></div>
+                    <div class="gauge-inner">
+                        <div class="gauge-score" id="ceci-score-display">--</div>
+                        <div class="gauge-label">CECI Index</div>
+                    </div>
+                </div>
+                <div id="risk-badge-container"></div>
+            </div>
+
+            <!-- Component Breakdown -->
+            <div class="card">
+                <div class="card-title">
+                    <div class="icon" style="background:rgba(6,182,212,0.15); color:var(--accent-cyan);">&#128202;</div>
+                    Component Breakdown
+                </div>
+                <div class="component-bars" id="component-bars"></div>
+                <div style="margin-top:12px; font-size:0.85rem; color:var(--text-muted);">
+                    <strong>CECI</strong> = w1 &middot; PID + w2 &middot; (1 - Var) - w3 &middot; PEff
+                </div>
+            </div>
+        </div>
+
+        <!-- Clinical Note -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:rgba(139,92,246,0.15); color:var(--accent-purple);">&#128221;</div>
+                Clinical Interpretation
+            </div>
+            <div class="clinical-note" id="clinical-note">--</div>
+        </div>
+
+        <!-- Session History -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:rgba(245,158,11,0.15); color:var(--accent-amber);">&#128200;</div>
+                Session History
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="session-table" id="session-history-table">
+                    <thead>
+                        <tr>
+                            <th>Session</th>
+                            <th>Accuracy</th>
+                            <th>Reaction Time</th>
+                            <th>Hesitation</th>
+                            <th>Completion</th>
+                            <th>Engagement</th>
+                        </tr>
+                    </thead>
+                    <tbody id="session-history-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:10px;">
+            <button class="btn btn-secondary" onclick="resetAll()">&#8592; Start New Assessment</button>
+        </div>
+    </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
